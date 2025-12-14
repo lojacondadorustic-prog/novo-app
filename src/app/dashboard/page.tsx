@@ -23,6 +23,10 @@ export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+const handleLogout = async () => {
+  await supabase.auth.signOut();
+  router.replace('/login');
+};
 
  useEffect(() => {
   const loadSession = async () => {
@@ -121,7 +125,12 @@ export default function DashboardPage() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-1">Dashboard NutriDog Pro</h1>
-            <p className="text-gray-600">Bem-vindo de volta, <span className="font-semibold">{user.email}</span></p>
+            {user && (
+  <p className="text-gray-600">
+    Bem-vindo de volta, <span className="font-semibold">{user.email}</span>
+  </p>
+)}
+
           </div>
           <div className="flex gap-3">
             <button
@@ -201,6 +210,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Stats Cards */}
+    
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
             <div className="flex items-center justify-between mb-3">
