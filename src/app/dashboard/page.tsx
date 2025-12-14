@@ -24,50 +24,21 @@ export default function DashboardPage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Verificar autenticação
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setUser(session.user);
-      } else {
-        router.push('/login');
-      }
-      setLoading(false);
-    });
+ useEffect(() => {
+  const loadSession = async () => {
+    const { data } = await supabase.auth.getSession();
 
-    // Listener para mudanças de autenticação
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) {
-        setUser(session.user);
-      } else {
-        router.push('/login');
-      }
-    });
+    if (!data.session) {
+      router.replace('/login');
+      return;
+    }
 
-    return () => subscription.unsubscribe();
-  }, [router]);
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push('/login');
+    setUser(data.session.user);
+    setLoading(false);
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#0F5A8A] mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">Carregando dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return null;
-  }
+  loadSession();
+}, [router]);
 
   // Mock data - em produção viria de API/database
   const pet = {
